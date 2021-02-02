@@ -48,4 +48,10 @@
   <data name="If comments should be enabled for this post" xml:space="preserve">
     <value>Sollen Kommentare für diesen Beitrag aktiviert werden</value>
   </data>
+  <data name="If the post should be indexed by search engines." xml:space="preserve">
+    <value>Wenn der Beitrag von Suchmaschinen indiziert werden soll.</value>
+  </data>
+  <data name="If links from this post should be indexed." xml:space="preserve">
+    <value>Wenn Links von diesem Beitrag indiziert werden sollten.</value>
+  </data>
 </root>

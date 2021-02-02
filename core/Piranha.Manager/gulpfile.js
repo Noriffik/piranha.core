@@ -15,14 +15,16 @@ var path = require('path'),
     babelTemplate = require("@babel/template").default,
     codeFrameColumns = require('@babel/code-frame').codeFrameColumns,
     babelTypes = require("@babel/types"),
-    through2 = require('through2');
+    through2 = require('through2'),
+    rtlcss = require('gulp-rtlcss');
 
 function vueCompile() {
     return through2.obj(function (file, _, callback) {
         var relativeFile = path.relative(file.cwd, file.path);
         var ext = path.extname(file.path);
         if (ext === '.vue') {
-            function getComponent(ast, sourceCode) {
+            var getComponent;
+            getComponent = function (ast, sourceCode) {
                 const ta = ast.program.body[0]
                 if (!babelTypes.isExportDefaultDeclaration(ta)) {
                     var msg = 'Top level declation in file ' + relativeFile + ' must be "export default {" \n' + codeFrameColumns(sourceCode, { start: ta.loc.start }, { highlightCode: true });
@@ -31,7 +33,8 @@ function vueCompile() {
                 return ta.declaration;
             }
 
-            function compile(componentName, content) {
+            var compile;
+            compile = function (componentName, content) {
                 var component = vueCompiler.parseComponent(content, []);
                 if (component.styles.length > 0) {
                     component.styles.forEach(s => {
@@ -152,10 +155,12 @@ var js = [
             "assets/src/js/piranha.utils.js",
             "assets/src/js/piranha.blockpicker.js",
             "assets/src/js/piranha.notifications.js",
+            "assets/src/js/piranha.contentpicker.js",
             "assets/src/js/piranha.mediapicker.js",
             "assets/src/js/piranha.pagepicker.js",
             "assets/src/js/piranha.postpicker.js",
             "assets/src/js/piranha.preview.js",
+            "assets/src/js/piranha.languageedit.js",
             "assets/src/js/piranha.resources.js",
             "assets/src/js/piranha.editor.js",
             "assets/src/js/components/page-item.vue"
@@ -193,7 +198,7 @@ var js = [
         ]
     },
     {
-        name: "piranha.contentedit.js",
+        name: "piranha.components.js",
         items: [
             "assets/src/js/components/region.vue",
             "assets/src/js/components/post-archive.vue",
@@ -203,6 +208,7 @@ var js = [
             "assets/src/js/components/generic-block.vue",
 
             "assets/src/js/components/blocks/audio-block.vue",
+            "assets/src/js/components/blocks/content-block.vue",
             "assets/src/js/components/blocks/html-block.vue",
             "assets/src/js/components/blocks/html-column-block.vue",
             "assets/src/js/components/blocks/image-block.vue",
@@ -216,6 +222,9 @@ var js = [
 
             "assets/src/js/components/fields/audio-field.vue",
             "assets/src/js/components/fields/checkbox-field.vue",
+            "assets/src/js/components/fields/color-field.vue",
+            "assets/src/js/components/fields/content-field.vue",
+            "assets/src/js/components/fields/data-select-field.vue",
             "assets/src/js/components/fields/date-field.vue",
             "assets/src/js/components/fields/document-field.vue",
             "assets/src/js/components/fields/html-field.vue",
@@ -231,6 +240,18 @@ var js = [
             "assets/src/js/components/fields/string-field.vue",
             "assets/src/js/components/fields/text-field.vue",
             "assets/src/js/components/fields/video-field.vue",
+        ]
+    },
+    {
+        name: "piranha.contentlist.js",
+        items: [
+            "assets/src/js/piranha.contentlist.js"
+        ]
+    },
+    {
+        name: "piranha.contentedit.js",
+        items: [
+            "assets/src/js/piranha.contentedit.js"
         ]
     },
     {
@@ -267,6 +288,33 @@ var js = [
         ]
     }
 ];
+
+
+//
+// Compile & minimize & rtl less files
+//
+gulp.task("rtl:min:css", function (done) {
+    // Minimize and combine styles
+    for (var n = 0; n < css.length; n++)
+    {
+        gulp.src(css[n])
+            .pipe(sass().on("error", sass.logError))
+            .pipe(cssmin())
+            .pipe(rtlcss()) // Convert to RTL.
+            .pipe(rename({
+                suffix: ".rtl.min"
+            }))
+            .pipe(gulp.dest(output + "css"));
+    }
+
+    // Copy fonts
+    for (var n = 0; n < fonts.length; n++)
+    {
+        gulp.src(fonts[n])
+            .pipe(gulp.dest(output + "webfonts"));
+    }
+    done();
+});
 
 //
 // Compile & minimize less files
@@ -317,5 +365,5 @@ gulp.task("min:js", function (done) {
 //
 // Default tasks
 //
-gulp.task("serve", gulp.parallel(["min:css", "min:js"]));
+gulp.task("serve", gulp.parallel(["min:css", "min:js", "rtl:min:css"]));
 gulp.task("default", gulp.series("serve"));

@@ -51,7 +51,10 @@ namespace Piranha.Manager.Services
 
             if (site != null)
             {
-                return Transform(site);
+                var model = Transform(site);
+                model.Languages = await _api.Languages.GetAllAsync();
+
+                return model;
             }
             return null;
         }
@@ -81,11 +84,13 @@ namespace Piranha.Manager.Services
         /// Creates a new site edit model.
         /// </summary>
         /// <returns>The edit model</returns>
-        public SiteEditModel Create()
+        public async Task<SiteEditModel> Create()
         {
             return new SiteEditModel
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                LanguageId = (await _api.Languages.GetDefaultAsync()).Id,
+                Languages = await _api.Languages.GetAllAsync()
             };
         }
 
@@ -105,11 +110,13 @@ namespace Piranha.Manager.Services
                 };
             }
             site.SiteTypeId = model.TypeId;
+            site.LanguageId = model.LanguageId;
             site.Title = model.Title;
             site.InternalId = model.InternalId;
             site.Culture = model.Culture;
             site.Hostnames = model.Hostnames;
             site.Description = model.Description;
+            site.Logo = model.Logo;
             site.IsDefault = model.IsDefault;
 
             await _api.Sites.SaveAsync(site);
@@ -214,10 +221,12 @@ namespace Piranha.Manager.Services
             {
                 Id = site.Id,
                 TypeId = site.SiteTypeId,
+                LanguageId = site.LanguageId,
                 Title = site.Title,
                 InternalId = site.InternalId,
                 Culture = site.Culture,
                 Description = site.Description,
+                Logo = site.Logo,
                 Hostnames = site.Hostnames,
                 IsDefault = site.IsDefault,
                 SiteTypes = App.SiteTypes.Select(t => new ContentTypeModel

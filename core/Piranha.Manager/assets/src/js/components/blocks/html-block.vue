@@ -1,6 +1,6 @@
 <template>
     <div class="block-body" :class="{ empty: isEmpty }">
-        <div contenteditable="true" :id="uid" spellcheck="false" v-html="body" v-on:blur="onBlur"></div>
+        <div contenteditable="true" :id="uid" v-html="body" v-on:blur="onBlur"></div>
     </div>
 </template>
 
@@ -14,7 +14,7 @@ export default {
     },
     methods: {
         onBlur: function (e) {
-            this.model.body.value = e.target.innerHTML;
+            this.model.body.value = tinyMCE.activeEditor.getContent();
         },
         onChange: function (data) {
             this.model.body.value = data;

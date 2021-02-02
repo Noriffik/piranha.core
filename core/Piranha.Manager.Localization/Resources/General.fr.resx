@@ -15,6 +15,9 @@
   <data name="Add" xml:space="preserve">
     <value>Ajouter</value>
   </data>
+  <data name="Advanced" xml:space="preserve">
+    <value>Avancé</value>
+  </data>
   <data name="All" xml:space="preserve">
     <value>Tous</value>
   </data>
@@ -38,6 +41,9 @@
   </data>
   <data name="Culture" xml:space="preserve">
     <value>Culture</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Défaut</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Supprimer</value>
@@ -92,6 +98,12 @@
   </data>
   <data name="Is default" xml:space="preserve">
     <value>Par défaut</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Langue</value>
+  </data>
+  <data name="Languages" xml:space="preserve">
+    <value>Langues</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>Connexion</value>
@@ -173,6 +185,12 @@
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Paramètres</value>
+  </data>
+  <data name="SEO" xml:space="preserve">
+    <value>SEO</value>
+  </data>
+  <data name="Sharing" xml:space="preserve">
+    <value>Partager</value>
   </data>
   <data name="Size" xml:space="preserve">
     <value>Taille</value>

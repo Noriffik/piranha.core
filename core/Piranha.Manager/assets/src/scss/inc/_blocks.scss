@@ -17,6 +17,24 @@
     >div >.block {
         margin: -1rem 0;
     }
+
+    &.blocks-outline {
+        .block {
+            border-color: $gray-400;
+
+            .block {
+                border-color: transparent;
+            }
+
+            &.danger {
+                border-color: $danger;
+            }
+
+            &.block-group:hover:not(.danger), &:focus-within {
+                border-color: $gray-400;
+            }
+        }
+    }
 }
 
 .block {
@@ -233,8 +251,20 @@
     }
 
     &.primary-image {
-        padding: 1rem 0;
-        margin-bottom: 2rem !important;
+        &:not(.primary-image-modal) {
+            padding: 1rem 0;
+            margin-bottom: 2rem !important;
+        }
+        &.primary-image-modal {
+            background: $white;
+            padding: .5rem;
+            margin-bottom: 0 !important;
+            border: 1px solid $gray-400;
+
+            &:hover {
+                border: 1px solid $gray-400;
+            }
+        }
 
         &:hover, &:focus-within {
             border-color: transparent;
@@ -278,7 +308,7 @@
     }
 }
 
-.page-block, .post-block {
+.page-block, .post-block, .content-block {
     .page-image {
         float: left;
         background: $body-bg;
@@ -303,7 +333,7 @@
 
 .block-group {
     .col:not(:only-child) {
-        .page-block, .post-block {
+        .page-block, .post-block, .content-block {
             .page-image {
                 float: none;
                 margin-bottom: .5rem;

@@ -15,6 +15,9 @@
   <data name="Add" xml:space="preserve">
     <value>Добавить</value>
   </data>
+  <data name="Advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
   <data name="All" xml:space="preserve">
     <value>Все</value>
   </data>
@@ -38,6 +41,9 @@
   </data>
   <data name="Culture" xml:space="preserve">
     <value>Язык</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>По умолчанию</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
@@ -92,6 +98,12 @@
   </data>
   <data name="Is default" xml:space="preserve">
     <value>По умолчанию</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="Languages" xml:space="preserve">
+    <value>Языки</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>Войти</value>
@@ -174,6 +186,12 @@
   <data name="Settings" xml:space="preserve">
     <value>Настройки</value>
   </data>
+  <data name="SEO" xml:space="preserve">
+    <value>SEO</value>
+  </data>
+  <data name="Sharing" xml:space="preserve">
+    <value>Sharing</value>
+  </data>
   <data name="Size" xml:space="preserve">
     <value>Размер</value>
   </data>
@@ -184,7 +202,7 @@
     <value>Система</value>
   </data>
   <data name="Temporary" xml:space="preserve">
-    <value>Temporary</value>
+    <value>Временный</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Заголовок</value>
@@ -223,7 +241,7 @@
     <value>Ширина</value>
   </data>
   <data name="Archives and Comments" xml:space="preserve">
-    <value>Archives and Comments</value>
+    <value>Архивы и комментарии</value>
   </data>
   <data name="Author" xml:space="preserve">
     <value>Автор</value>
@@ -232,7 +250,7 @@
     <value>Комментарии</value>
   </data>
   <data name="Created" xml:space="preserve">
-    <value>Created</value>
+    <value>Создан</value>
   </data>
   <data name="Username and/or password are incorrect." xml:space="preserve">
     <value>Неверное имя пользователя или пароль.</value>

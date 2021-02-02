@@ -14,10 +14,16 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Piranha.AspNetCore.Helpers;
 using Piranha.Models;
 
 namespace Piranha.AspNetCore.Services
 {
+    /// <summary>
+    /// The main application service. This service must be
+    /// registered as a scoped service as it contains information
+    /// about the current requst.
+    /// </summary>
     public class ApplicationService : IApplicationService
     {
         /// <summary>
@@ -28,12 +34,17 @@ namespace Piranha.AspNetCore.Services
         /// <summary>
         /// Gets the site helper.
         /// </summary>
-        public ISiteHelper Site { get; internal set; }
+        public ISiteHelper Site { get; }
 
         /// <summary>
         /// Gets the media helper.
         /// </summary>
-        public IMediaHelper Media { get; internal set; }
+        public IMediaHelper Media { get; }
+
+        /// <summary>
+        /// Gets the request helper.
+        /// </summary>
+        public IRequestHelper Request { get; } = new RequestHelper();
 
         /// <summary>
         /// Gets/sets the currently requested URL.

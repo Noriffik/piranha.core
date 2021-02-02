@@ -2,12 +2,12 @@
     <div class="row block-body">
         <div class="col-md-6">
             <div :class="{ empty: isEmpty1 }">
-                <div :id="uid + 1" contenteditable="true" spellcheck="false" v-html="column1" v-on:blur="onBlurCol1"></div>
+                <div :id="uid + 1" contenteditable="true" v-html="column1" v-on:blur="onBlurCol1"></div>
             </div>
         </div>
         <div class='col-md-6'>
             <div :class='{ empty: isEmpty2 }'>
-                <div :id="uid + 2" contenteditable="true" spellcheck="false" v-html="column2" v-on:blur="onBlurCol2"></div>
+                <div :id="uid + 2" contenteditable="true" v-html="column2" v-on:blur="onBlurCol2"></div>
             </div>
         </div>
     </div>
@@ -24,10 +24,10 @@ export default {
     },
     methods: {
         onBlurCol1: function (e) {
-            this.model.column1.value = e.target.innerHTML;
+            this.model.column1.value = tinyMCE.activeEditor.getContent();;
         },
         onBlurCol2: function (e) {
-            this.model.column2.value = e.target.innerHTML;
+            this.model.column2.value = tinyMCE.activeEditor.getContent();;
         },
         onChangeCol1: function (data) {
             this.model.column1.value = data;

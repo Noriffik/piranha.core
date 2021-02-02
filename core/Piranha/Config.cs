@@ -41,6 +41,7 @@ namespace Piranha
         public static readonly string MANAGER_PAGE_SIZE = "ManagerPageSize";
         public static readonly string MANAGER_DEFAULT_COLLAPSED_BLOCKS = "ManagerDefaultCollapsedBlocks";
         public static readonly string MANAGER_DEFAULT_COLLAPSED_BLOCKGROUPHEADERS = "ManagerDefaultCollapsedBlockGroupHeaders";
+        public static readonly string MANAGER_OUTLINED = "ManagerOutlined";
         public static readonly string PAGES_HIERARCHICAL_SLUGS = "HierarchicalPageSlugs";
         public static readonly string PAGE_REVISIONS = "PageRevisions";
         public static readonly string POST_REVISIONS = "PostRevisions";
@@ -392,6 +393,33 @@ namespace Piranha
         }
 
         /// <summary>
+        /// Gets/sets if elements in the manager should be outline with borders
+        /// to provide stronger visual guidance. The default value is false.
+        /// </summary>
+        /// <value></value>
+        public bool ManagerOutlined
+        {
+            get {
+                var param = _service.GetByKeyAsync(MANAGER_OUTLINED).GetAwaiter().GetResult();
+                if (param != null)
+                    return Convert.ToBoolean(param.Value);
+                return false;
+            }
+            set {
+                var param = _service.GetByKeyAsync(MANAGER_OUTLINED).GetAwaiter().GetResult();
+                if (param == null)
+                {
+                    param = new Param
+                    {
+                        Key = MANAGER_OUTLINED
+                    };
+                }
+                param.Value = value.ToString();
+                _service.SaveAsync(param).GetAwaiter().GetResult();
+            }
+        }
+
+        /// <summary>
         /// Gets/sets the optional URL for the CDN used. If this param isn't
         /// null it will be used when generating the PublicUrl for media.
         /// </summary>
@@ -492,7 +520,6 @@ namespace Piranha
         /// </summary>
         public void Dispose()
         {
-            GC.SuppressFinalize(this);
         }
     }
 }

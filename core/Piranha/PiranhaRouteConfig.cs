@@ -17,6 +17,11 @@ namespace Piranha
     public class PiranhaRouteConfig
     {
         /// <summary>
+        /// Gets/sets the login url.
+        /// </summary>
+        public string LoginUrl { get; set; } = "/login";
+
+        /// <summary>
         /// Gets/sets if alias routing should be used.
         /// </summary>
         public bool UseAliasRouting { get; set; } = true;
@@ -52,5 +57,19 @@ namespace Piranha
         /// should be used.
         /// </summary>
         public bool UseStartpageRouting { get; set; } = true;
+
+        /// <summary>
+        /// Disables all routing features of the application.
+        /// </summary>
+        public void DisableRouting()
+        {
+            UseAliasRouting = false;
+            UseArchiveRouting = false;
+            UsePageRouting = false;
+            UsePostRouting = false;
+            UseSitemapRouting = false;
+            UseSiteRouting = false;
+            UseStartpageRouting = false;
+        }
     }
 }

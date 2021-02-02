@@ -77,10 +77,13 @@ namespace Piranha
                 .Replace("é", "e")
                 .Replace("è", "e")
                 .Replace("í", "i")
-                .Replace("ì", "i");
+                .Replace("ì", "i")
+                .Replace("ž", "z")
+                .Replace("š", "s")
+                .Replace("č", "c");
 
             // Remove special characters
-            slug = Regex.Replace(slug, @"[^a-z0-9-/ ]", "").Replace("--", "-");
+            slug = Regex.Replace(slug, @"[^a-z\u0600-\u06FF0-9-/ ]", "").Replace("--", "-");
 
             // Remove whitespaces
             slug = Regex.Replace(slug.Replace("-", " "), @"\s+", " ").Replace(" ", "-");
@@ -222,6 +225,18 @@ namespace Piranha
             var version = assembly.GetName().Version;
 
             return $"{version.Major}.{version.Minor}.{version.Build}";
+        }
+
+        /// <summary>
+        /// Checks if the given assembly is a pre-release.
+        /// </summary>
+        /// <param name="assembly">The assembly</param>
+        /// <returns>If it is a pre-release</returns>
+        public static bool IsPreRelease(Assembly assembly)
+        {
+            var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToLower();
+
+            return version.Contains("alpha") || version.Contains("beta");
         }
 
         /// <summary>

@@ -17,7 +17,7 @@ namespace Piranha.Extend.Fields
     public class PageField : IField, IEquatable<PageField>
     {
         /// <summary>
-        /// Gets/sets the media id.
+        /// Gets/sets the page id.
         /// </summary>
         /// <returns></returns>
         public Guid? Id { get; set; }
@@ -25,7 +25,7 @@ namespace Piranha.Extend.Fields
         /// <summary>
         /// Gets/sets the related page object.
         /// </summary>
-        public Models.PageInfo Page { get; private set; }
+        public Models.PageInfo Page { get; set; }
 
         /// <summary>
         /// Gets if the field has a page object available.

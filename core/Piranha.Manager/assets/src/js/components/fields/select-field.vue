@@ -11,9 +11,9 @@ export default {
     props: ["uid", "model", "meta"],
     methods: {
         update: function () {
+            // Tell parent that title has been updated
             if (this.meta.notifyChange) {
-                // Tell parent that value has been updated
-                this.$emit('update-field', {
+                this.$emit('update-title', {
                     uid: this.uid,
                     title: this.meta.options[this.model.value]
                 });

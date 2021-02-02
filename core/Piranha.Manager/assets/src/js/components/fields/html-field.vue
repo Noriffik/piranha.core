@@ -1,12 +1,12 @@
 <template>
     <div class="field html-field" :class="{ empty: isEmpty }">
-        <div contenteditable="true" :id="uid" spellcheck="false" v-html="body" v-on:blur="onBlur"></div>
+        <div contenteditable="true" :id="uid" v-html="body" v-on:blur="onBlur"></div>
     </div>
 </template>
 
 <script>
 export default {
-    props: ["uid", "toolbar", "model"],
+    props: ["uid", "toolbar", "model", "meta"],
     data: function () {
         return {
             body: this.model.value
@@ -17,29 +17,35 @@ export default {
             this.model.value = tinyMCE.activeEditor.getContent();
 
             // Tell parent that title has been updated
-            var title = this.model.value.replace(/(<([^>]+)>)/ig, "");
-            if (title.length > 40) {
-                title = title.substring(0, 40) + "...";
-            }
+            if (this.meta.notifyChange) {
+                var title = this.model.value.replace(/(<([^>]+)>)/ig, "");
+                if (title.length > 40) {
+                    title = title.substring(0, 40) + "...";
+                }
 
-            this.$emit('update-title', {
-                uid: this.uid,
-                title: title
-            });
+                this.$emit('update-title', {
+                    uid: this.uid,
+                    title: title
+                });
+            }
         },
         onChange: function (data) {
             this.model.value = data;
 
             // Tell parent that title has been updated
-            var title = this.model.value.replace(/(<([^>]+)>)/ig, "");
-            if (title.length > 40) {
-                title = title.substring(0, 40) + "...";
-            }
+            if (this.meta.notifyChange) {
+                var title = this.model.value.replace(/(<([^>]+)>)/ig, "");
+                if (title.length > 40) {
+                    title = title.substring(0, 40) + "...";
+                }
 
-            this.$emit('update-title', {
-                uid: this.uid,
-                title: title
-            });
+                if (this.meta.notifyChange) {
+                    this.$emit('update-title', {
+                        uid: this.uid,
+                        title: title
+                    });
+                }
+            }
         }
     },
     computed: {

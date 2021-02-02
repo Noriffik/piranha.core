@@ -16,7 +16,8 @@ using Microsoft.Extensions.Hosting;
 using Piranha;
 using Piranha.Data.EF.SQLite;
 using Piranha.AspNetCore.Identity.SQLite;
-using Microsoft.OpenApi.Models;
+using Piranha.AttributeBuilder;
+using Piranha.Local;
 
 namespace MvcWeb
 {
@@ -26,33 +27,25 @@ namespace MvcWeb
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLocalization(options =>
-                options.ResourcesPath = "Resources"
-            );
-            services.AddControllersWithViews();
-            services.AddRazorPages()
-                .AddPiranhaManagerOptions();
-
-            services.AddPiranha();
-            services.AddPiranhaApplication();
-            services.AddPiranhaFileStorage();
-            services.AddPiranhaImageSharp();
-            services.AddPiranhaManager();
-            services.AddPiranhaTinyMCE();
-            services.AddPiranhaApi();
-
-            services.AddPiranhaEF<SQLiteDb>(options =>
-                options.UseSqlite("Filename=./piranha.mvcweb.db"));
-            services.AddPiranhaIdentityWithSeed<IdentitySQLiteDb>(options =>
-                options.UseSqlite("Filename=./piranha.mvcweb.db"));
-
-            services.AddMemoryCache();
-            services.AddPiranhaMemoryCache();
-
-            services.AddSwaggerGen(options =>
+            services.AddPiranha(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "PiranhaCMS API", Version = "v1" });
-                options.CustomSchemaIds(x => x.FullName);
+                options.AddRazorRuntimeCompilation = true;
+
+                options.UseFileStorage(naming: FileStorageNaming.UniqueFolderNames);
+                options.UseImageSharp();
+                options.UseManager();
+                options.UseTinyMCE();
+                options.UseMemoryCache();
+
+                options.UseEF<SQLiteDb>(db =>
+                    db.UseSqlite("Filename=./piranha.mvcweb.db"));
+                options.UseIdentityWithSeed<IdentitySQLiteDb>(db =>
+                    db.UseSqlite("Filename=./piranha.mvcweb.db"));
+
+                options.UseSecurity(o =>
+                {
+                    o.UsePermission("Subscriber");
+                });
             });
         }
 
@@ -62,14 +55,6 @@ namespace MvcWeb
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-
-                // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-                // specifying the Swagger JSON endpoint.
-                app.UseSwaggerUI(options =>
-                {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "PiranhaCMS API V1");
-                });
             }
 
             App.Init(api);
@@ -78,20 +63,13 @@ namespace MvcWeb
             App.CacheLevel = Piranha.Cache.CacheLevel.Full;
 
             // Build content types
-            var pageTypeBuilder = new Piranha.AttributeBuilder.PageTypeBuilder(api)
-                .AddType(typeof(Models.BlogArchive))
-                .AddType(typeof(Models.StandardPage))
-                .AddType(typeof(Models.TeaserPage))
+            new ContentTypeBuilder(api)
+                .AddAssembly(typeof(Startup).Assembly)
                 .Build()
                 .DeleteOrphans();
-            var postTypeBuilder = new Piranha.AttributeBuilder.PostTypeBuilder(api)
-                .AddType(typeof(Models.BlogPost))
-                .Build()
-                .DeleteOrphans();
-            var siteTypeBuilder = new Piranha.AttributeBuilder.SiteTypeBuilder(api)
-                .AddType(typeof(Models.StandardSite))
-                .Build()
-                .DeleteOrphans();
+
+            // Configure editor
+            Piranha.Manager.Editor.EditorConfig.FromFile("editorconfig.json");
 
             /**
              *
@@ -102,22 +80,11 @@ namespace MvcWeb
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
              */
 
-            // Register middleware
-            app.UseStaticFiles();
-            app.UsePiranha();
-            app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UsePiranhaIdentity();
-            app.UsePiranhaManager();
-            app.UsePiranhaTinyMCE();
-            app.UseEndpoints(endpoints =>
+            app.UsePiranha(options =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-                endpoints.MapPiranhaManager();
+                options.UseManager();
+                options.UseTinyMCE();
+                options.UseIdentity();
             });
 
             Seed.RunAsync(api).GetAwaiter().GetResult();

@@ -15,7 +15,7 @@
                     <span v-if="meta.placeholder == null" class="text-secondary">&nbsp;</span>
                 </div>
                 <div class="card-body" v-else>
-                    <a href="#">{{ model.post.title }}</a>
+                    <a href="piranha.baseUrl + 'manager/post/edit/' + model.post.id" target="_blank">{{ model.post.title }}</a>
                 </div>
             </div>
         </div>
@@ -38,10 +38,12 @@ export default {
             this.model.post = post;
 
             // Tell parent that title has been updated
-            this.$emit('update-title', {
-                uid: this.uid,
-                title: this.model.post.title
-            });
+            if (this.meta.notifyChange) {
+                this.$emit('update-title', {
+                    uid: this.uid,
+                    title: this.model.post.title
+                });
+            }
         }
     },
     computed: {

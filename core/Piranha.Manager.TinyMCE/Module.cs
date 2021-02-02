@@ -13,6 +13,9 @@ using Piranha.Extend;
 
 namespace Piranha.Manager.TinyMCE
 {
+    /// <summary>
+    /// Module definition for the TinyMCE module.
+    /// </summary>
     public sealed class Module : IModule
     {
         /// <summary>
@@ -43,7 +46,7 @@ namespace Piranha.Manager.TinyMCE
         /// <summary>
         /// Gets the icon url.
         /// </summary>
-        public string IconUrl => "http://piranhacms.org/assets/twitter-shield.png";
+        public string IconUrl => "https://piranhacms.org/assets/twitter-shield.png";
 
         /// <summary>
         /// The assembly.

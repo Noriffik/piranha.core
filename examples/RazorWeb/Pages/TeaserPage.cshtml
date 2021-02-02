@@ -3,6 +3,10 @@
 @{
     ViewData["Title"] = Model.Data.Title;
 }
+@section head
+{
+    @WebApp.MetaTags(Model.Data)
+}
 
 @Html.DisplayFor(m => m.Data.Hero)
 
@@ -14,7 +18,7 @@
                 Latest news:
                 <strong>@Model.Data.LatestPost.Published.Value.ToString("yyyy-MM-dd")</strong>
                 -
-                <a href="@Model.Data.LatestPost.Permalink">@Model.Data.LatestPost.Title</a>
+                <a href="@WebApp.Url(Model.Data.LatestPost)">@Model.Data.LatestPost.Title</a>
             </div>
         </div>
     </div>

@@ -19,7 +19,7 @@
     <value>Une erreur s'est produite lors de la suppression de la page</value>
   </data>
   <data name="Archive" xml:space="preserve">
-    <value>Archive</value>
+    <value>Archiver</value>
   </data>
   <data name="Detach page" xml:space="preserve">
     <value>Détacher la page</value>
@@ -36,11 +36,29 @@
   <data name="If the page should be hidden in the sitemap" xml:space="preserve">
     <value>Si la page doit être cachée dans le plan du site</value>
   </data>
+  <data name="If the page should be indexed by search engines." xml:space="preserve">
+    <value>Si la page doit être indexée par les moteurs de recherche.</value>
+  </data>
+  <data name="If links from this page should be indexed." xml:space="preserve">
+    <value>Si les liens depuis cette page doivent être indexés.</value>
+  </data>
+  <data name="Meta title" xml:space="preserve">
+    <value>Méta titre</value>
+  </data>
   <data name="Meta keywords" xml:space="preserve">
     <value>Méta mots-clés</value>
   </data>
   <data name="Meta description" xml:space="preserve">
     <value>Méta description</value>
+  </data>
+  <data name="Og title" xml:space="preserve">
+    <value>Titre Open Graph</value>
+  </data>
+  <data name="Og image" xml:space="preserve">
+    <value>Image Open Graph</value>
+  </data>
+  <data name="Og description" xml:space="preserve">
+    <value>Description Open Graph</value>
   </data>
   <data name="Navigation title" xml:space="preserve">
     <value>Titre de la navigation</value>

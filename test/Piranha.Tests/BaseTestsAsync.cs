@@ -27,13 +27,22 @@ namespace Piranha.Tests
     {
         protected IStorage _storage = new Local.FileStorage("uploads/", "~/uploads/");
         protected IImageProcessor _processor = new ImageSharpProcessor();
-        protected IServiceProvider _services = new ServiceCollection()
-            .AddPiranhaFileStorage()
-            .BuildServiceProvider();
+        protected IServiceProvider _services = CreateServiceCollection().BuildServiceProvider();
         protected ICache _cache;
 
         public abstract Task InitializeAsync();
         public abstract Task DisposeAsync();
+
+        protected static IServiceCollection CreateServiceCollection()
+        {
+            return new ServiceCollection()
+                .AddPiranhaEF<SQLiteDb>(db =>
+                    db.UseSqlite("Filename=./piranha.tests.db"))
+                .AddPiranha()
+                .AddMemoryCache()
+                .AddDistributedMemoryCache()
+                .AddPiranhaFileStorage();
+        }
 
         /// <summary>
         /// Gets the test context.
@@ -60,6 +69,10 @@ namespace Piranha.Tests
                 factory,
                 new AliasRepository(db),
                 new ArchiveRepository(db),
+                new ContentRepository(db, serviceFactory),
+                new ContentGroupRepository(db),
+                new ContentTypeRepository(db),
+                new LanguageRepository(db),
                 new Piranha.Repositories.MediaRepository(db),
                 new PageRepository(db, serviceFactory),
                 new PageTypeRepository(db),

@@ -19,7 +19,7 @@
     <value>Произошла ошибка при удалении страницы</value>
   </data>
   <data name="Archive" xml:space="preserve">
-    <value>Archive</value>
+    <value>Архив</value>
   </data>
   <data name="Detach page" xml:space="preserve">
     <value>Открепить страницу</value>
@@ -36,11 +36,29 @@
   <data name="If the page should be hidden in the sitemap" xml:space="preserve">
     <value>Страница должна быть скрыта на карте сайта</value>
   </data>
+  <data name="If the page should be indexed by search engines." xml:space="preserve">
+    <value>If the page should be indexed by search engines.</value>
+  </data>
+  <data name="If links from this page should be indexed." xml:space="preserve">
+    <value>If links from this page should be indexed.</value>
+  </data>
+  <data name="Meta title" xml:space="preserve">
+    <value>Мета заголовок</value>
+  </data>
   <data name="Meta keywords" xml:space="preserve">
     <value>Ключевые слова (Meta)</value>
   </data>
   <data name="Meta description" xml:space="preserve">
     <value>Описание (Meta)</value>
+  </data>
+  <data name="Og title" xml:space="preserve">
+    <value>Og title</value>
+  </data>
+  <data name="Og image" xml:space="preserve">
+    <value>Og image</value>
+  </data>
+  <data name="Og description" xml:space="preserve">
+    <value>Og description</value>
   </data>
   <data name="Navigation title" xml:space="preserve">
     <value>Заголовок в навигации</value>

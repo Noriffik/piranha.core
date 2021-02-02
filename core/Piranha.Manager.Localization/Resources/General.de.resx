@@ -15,6 +15,9 @@
   <data name="Add" xml:space="preserve">
     <value>Hinzufügen</value>
   </data>
+  <data name="Advanced" xml:space="preserve">
+    <value>Erweiterte</value>
+  </data>
   <data name="All" xml:space="preserve">
     <value>Alle</value>
   </data>
@@ -38,6 +41,9 @@
   </data>
   <data name="Culture" xml:space="preserve">
     <value>Kultur-Einstellung</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Standard</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Löschen</value>
@@ -92,6 +98,12 @@
   </data>
   <data name="Is default" xml:space="preserve">
     <value>Standard</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Sprache</value>
+  </data>
+  <data name="Languages" xml:space="preserve">
+    <value>Sprachen</value>
   </data>
   <data name="Login" xml:space="preserve">
     <value>Anmelden</value>
@@ -174,6 +186,12 @@
   <data name="Settings" xml:space="preserve">
     <value>Einstellungen</value>
   </data>
+  <data name="SEO" xml:space="preserve">
+    <value>SEO</value>
+  </data>
+  <data name="Sharing" xml:space="preserve">
+    <value>Teilen</value>
+  </data>
   <data name="Size" xml:space="preserve">
     <value>Größe</value>
   </data>
@@ -235,6 +253,6 @@
     <value>Erstellt am</value>
   </data>
   <data name="Username and/or password are incorrect." xml:space="preserve">
-    <value>Username and/or password are incorrect.</value>
+    <value>Benutzername und/oder Passwort sind falsch.</value>
   </data>
 </root>

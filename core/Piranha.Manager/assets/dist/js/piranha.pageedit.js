@@ -15,11 +15,22 @@ piranha.pageedit = new Vue({
         title: null,
         navigationTitle: null,
         slug: null,
+        metaTitle: null,
         metaKeywords: null,
         metaDescription: null,
+        metaIndex: null,
+        metaFollow: null,
+        metaPriority: null,
+        ogTitle: null,
+        ogDescription: null,
+        ogImage: {
+            id: null,
+            media: null
+        },
         excerpt: null,
         isHidden: false,
         published: null,
+        publishedTime: null,
         redirectUrl: null,
         redirectType: null,
         enableComments: null,
@@ -65,13 +76,25 @@ piranha.pageedit = new Vue({
         },
         primaryImageUrl: function () {
             if (this.primaryImage.media != null) {
-                return piranha.utils.formatUrl(this.primaryImage.media.publicUrl);
+                return piranha.utils.formatUrl("~/manager/api/media/url/" + this.primaryImage.id + "/448/200");
+                //return piranha.utils.formatUrl(this.primaryImage.media.publicUrl);
             } else {
                 return piranha.utils.formatUrl("~/manager/assets/img/empty-image.png");
             }
         },
         isExcerptEmpty: function () {
             return piranha.utils.isEmptyText(this.excerpt);
+        },
+        metaPriorityDescription: function() {
+            var description = piranha.resources.texts.important;
+            if (this.metaPriority <= 0.3)
+                description = piranha.resources.texts.low;
+            else if (this.metaPriority <= 0.6)
+                description =  piranha.resources.texts.medium;
+            else if (this.metaPriority <= 0.9)
+                description =  piranha.resources.texts.high;
+            
+            return description += " (" + this.metaPriority + ")";
         }
     },
     mounted() {
@@ -91,11 +114,19 @@ piranha.pageedit = new Vue({
             this.title = model.title;
             this.navigationTitle = model.navigationTitle;
             this.slug = model.slug;
+            this.metaTitle = model.metaTitle;
             this.metaKeywords = model.metaKeywords;
             this.metaDescription = model.metaDescription;
+            this.metaIndex = model.metaIndex;
+            this.metaFollow = model.metaFollow;
+            this.metaPriority = model.metaPriority;
+            this.ogTitle = model.ogTitle;
+            this.ogDescription = model.ogDescription;
+            this.ogImage = model.ogImage;
             this.excerpt = model.excerpt;
             this.isHidden = model.isHidden;
             this.published = model.published;
+            this.publishedTime = model.publishedTime;
             this.redirectUrl = model.redirectUrl;
             this.redirectType = model.redirectType;
             this.enableComments = model.enableComments;
@@ -216,11 +247,21 @@ piranha.pageedit = new Vue({
                 title: self.title,
                 navigationTitle: self.navigationTitle,
                 slug: self.slug,
+                metaTitle: self.metaTitle,
                 metaKeywords: self.metaKeywords,
                 metaDescription: self.metaDescription,
+                metaIndex: self.metaIndex,
+                metaFollow: self.metaFollow,
+                metaPriority: self.metaPriority,
+                ogTitle: self.ogTitle,
+                ogDescription: self.ogDescription,
+                ogImage: {
+                    id: self.ogImage.id
+                },
                 excerpt: self.excerpt,
                 isHidden: self.isHidden,
                 published: self.published,
+                publishedTime: self.publishedTime,
                 redirectUrl: self.redirectUrl,
                 redirectType: self.redirectType,
                 enableComments: self.enableComments,
@@ -249,6 +290,7 @@ piranha.pageedit = new Vue({
                 self.id = result.id;
                 self.slug = result.slug;
                 self.published = result.published;
+                self.publishedTime = result.publishedTime;
                 self.state = result.state;
                 self.isCopy = result.isCopy;
                 self.selectedRoute = result.selectedRoute;
@@ -358,13 +400,13 @@ piranha.pageedit = new Vue({
             });
         },
         isCommentsOpen: function () {
-            var date = new Date(this.published);
+            var date = new Date(this.published + " " + this.publishedTime);
             date = date.addDays(this.closeCommentsAfterDays);
 
             return date > new Date();
         },
         commentsClosedDate: function () {
-            var date = new Date(this.published);
+            var date = new Date(this.published + " " + this.publishedTime);
             date = date.addDays(this.closeCommentsAfterDays);
 
             return date.toDateString();
@@ -389,7 +431,7 @@ piranha.pageedit = new Vue({
             }
         },
         onExcerptBlur: function (e) {
-            this.excerpt = e.target.innerHTML;
+            this.excerpt = tinyMCE.activeEditor.getContent();
         }
     },
     created: function () {

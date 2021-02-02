@@ -225,6 +225,10 @@ namespace Piranha.Manager.Services
                 post.Id = Guid.NewGuid();
                 post.BlogId = archiveId;
 
+                // Perform manager init
+                await _factory.InitDynamicManagerAsync(post,
+                    App.PostTypes.GetById(post.TypeId));
+
                 var postModel = Transform(post, false);
 
                 postModel.Categories = (await _api.Posts.GetAllCategoriesAsync(post.BlogId))
@@ -263,8 +267,15 @@ namespace Piranha.Manager.Services
                 post.TypeId = model.TypeId;
                 post.Title = model.Title;
                 post.Slug = model.Slug;
+                post.MetaTitle = model.MetaTitle;
                 post.MetaKeywords = model.MetaKeywords;
                 post.MetaDescription = model.MetaDescription;
+                post.MetaIndex = model.MetaIndex;
+                post.MetaFollow = model.MetaFollow;
+                post.MetaPriority = model.MetaPriority;
+                post.OgTitle = model.OgTitle;
+                post.OgDescription = model.OgDescription;
+                post.OgImage = model.OgImage;
                 post.Excerpt = model.Excerpt;
                 post.Published = !string.IsNullOrEmpty(model.Published) ? DateTime.Parse(model.Published) : (DateTime?)null;
                 post.RedirectUrl = model.RedirectUrl;
@@ -444,8 +455,15 @@ namespace Piranha.Manager.Services
                 PrimaryImage = post.PrimaryImage,
                 Title = post.Title,
                 Slug = post.Slug,
+                MetaTitle = post.MetaTitle,
                 MetaKeywords = post.MetaKeywords,
                 MetaDescription = post.MetaDescription,
+                MetaIndex = post.MetaIndex,
+                MetaFollow = post.MetaFollow,
+                MetaPriority = post.MetaPriority,
+                OgTitle = post.OgTitle,
+                OgDescription = post.OgDescription,
+                OgImage = post.OgImage,
                 Excerpt = post.Excerpt,
                 Published = post.Published?.ToString("yyyy-MM-dd HH:mm"),
                 RedirectUrl = post.RedirectUrl,

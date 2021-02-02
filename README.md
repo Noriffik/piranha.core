@@ -22,18 +22,39 @@ This is a **complete rewrite** of Piranha CMS for `.NET Core`. The goal of this 
 is to create a version capable of targeting multiple platforms & frameworks with minimal
 depenencies, but still provide a flexible & high performance CMS library.
 
-Piranha is currently built for `NetStandard 2.0` and `NetCoreApp 3.1` and uses in its simplest form the following awesome packages:
+Piranha is currently built for `.NET 5` and uses in its simplest form the following awesome packages:
 
-* Markdig `0.18.0`
-* Microsoft.EntityFrameworkCore `3.1.0`
+* AutoMapper `10.1.1`
+* Markdig `0.22.1`
+* Microsoft.EntityFrameworkCore `5.0.0`
 * Newtonsoft.Json `12.0.3`
 
 ## Getting started
 
 ### Prerequisites
 
-* [.NET Core SDK 3.1.100](https://dotnet.microsoft.com/download/dotnet-core/3.1)
+* [.NET 5.0 SDK](https://dotnet.microsoft.com/download/dotnet/5.0)
 * An IDE or Editor of your choice
+
+### Create a new project from our templates
+
+To use our project templates you first need to download and install them from NuGet. This can be done with:
+
+~~~ bash
+dotnet new -i Piranha.Templates
+~~~
+
+When creating a new project with `dotnet new` you should first create a new empty folder. The default behaviour is that the new project is **named after its containing folder**.
+
+> Please note that naming your project `Piranha` (even if it is a test project) will result in a circular reference error when you try to restore the packages. This is due to a limitation in `dotnet restore`.
+
+After this is done you can create a new web project for razor pages with:
+
+~~~ bash
+dotnet new piranha.razor
+~~~
+
+To read more about of our available project templates, please read more on https://piranhacms.org/docs/basics/project-templates
 
 ### Get the latest source code and get going
 

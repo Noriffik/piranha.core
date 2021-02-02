@@ -9,6 +9,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Piranha.Models
 {
@@ -39,6 +40,16 @@ namespace Piranha.Models
         /// Gets/sets the optional navigation title.
         /// </summary>
         public string NavigationTitle { get; set; }
+
+        /// <summary>
+        /// Gets/sets the meta index.
+        /// </summary>
+        public bool MetaIndex { get; set; }
+
+        /// <summary>
+        /// Gets/sets the meta priority.
+        /// </summary>
+        public double MetaPriority { get; set; }
 
         /// <summary>
         /// Gets the menu title for the item. The menu title returns
@@ -86,6 +97,11 @@ namespace Piranha.Models
         /// Gets/sets the last modification date.
         /// </summary>
         public DateTime LastModified { get; set; }
+
+        /// <summary>
+        /// Gets/sets the permissions needed to access the page.
+        /// </summary>
+        public IList<string> Permissions { get; set; } = new List<string>();
 
         /// <summary>
         /// Default constructor.

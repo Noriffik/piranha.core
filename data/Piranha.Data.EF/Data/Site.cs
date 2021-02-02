@@ -16,6 +16,11 @@ namespace Piranha.Data
     public sealed class Site : ContentBase<SiteField>
     {
         /// <summary>
+        /// Gets/sets the language id.
+        /// </summary>
+        public Guid? LanguageId { get; set; }
+
+        /// <summary>
         /// Gets/sets the optional site type id.
         /// </summary>
         public string SiteTypeId { get; set; }
@@ -29,6 +34,11 @@ namespace Piranha.Data
         /// Gets/sets the optional description.
         /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// Gets/sets the optional logo image id.
+        /// </summary>
+        public Guid? LogoId { get; set; }
 
         /// <summary>
         /// Gets/sets the optional hostnames to bind this site for.
@@ -50,5 +60,10 @@ namespace Piranha.Data
         /// of the site's content.
         /// </summary>
         public DateTime? ContentLastModified { get; set; }
+
+        /// <summary>
+        /// Gets/sets the selected language.
+        /// </summary>
+        public Language Language { get; set; }
     }
 }

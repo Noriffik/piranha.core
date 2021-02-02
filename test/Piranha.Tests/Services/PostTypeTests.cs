@@ -10,18 +10,29 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Distributed;
 using Xunit;
 using Piranha.Models;
 
 namespace Piranha.Tests.Repositories
 {
     [Collection("Integration tests")]
-    public class PostTypeTestsCached : PostTypeTests
+    public class PostTypeTestsMemoryCache : PostTypeTests
     {
         public override Task InitializeAsync()
         {
-            _cache = new Cache.SimpleCache();
+            _cache = new Cache.MemoryCache((IMemoryCache)_services.GetService(typeof(IMemoryCache)));
+            return base.InitializeAsync();
+        }
+    }
 
+    [Collection("Integration tests")]
+    public class PostTypeTestsDistributedCache : PostTypeTests
+    {
+        public override Task InitializeAsync()
+        {
+            _cache = new Cache.DistributedCache((IDistributedCache)_services.GetService(typeof(IDistributedCache)));
             return base.InitializeAsync();
         }
     }
@@ -34,14 +45,14 @@ namespace Piranha.Tests.Repositories
             new PostType
             {
                 Id = "MyFirstType",
-                Regions = new List<RegionType>
+                Regions = new List<ContentTypeRegion>
                 {
-                    new RegionType
+                    new ContentTypeRegion
                     {
                         Id = "Body",
-                        Fields = new List<FieldType>
+                        Fields = new List<ContentTypeField>
                         {
-                            new FieldType
+                            new ContentTypeField
                             {
                                 Id = "Default",
                                 Type = "Html"
@@ -53,14 +64,14 @@ namespace Piranha.Tests.Repositories
             new PostType
             {
                 Id = "MySecondType",
-                Regions = new List<RegionType>
+                Regions = new List<ContentTypeRegion>
                 {
-                    new RegionType
+                    new ContentTypeRegion
                     {
                         Id = "Body",
-                        Fields = new List<FieldType>
+                        Fields = new List<ContentTypeField>
                         {
-                            new FieldType
+                            new ContentTypeField
                             {
                                 Id = "Default",
                                 Type = "Text"
@@ -72,14 +83,14 @@ namespace Piranha.Tests.Repositories
             new PostType
             {
                 Id = "MyThirdType",
-                Regions = new List<RegionType>
+                Regions = new List<ContentTypeRegion>
                 {
-                    new RegionType
+                    new ContentTypeRegion
                     {
                         Id = "Body",
-                        Fields = new List<FieldType>
+                        Fields = new List<ContentTypeField>
                         {
-                            new FieldType
+                            new ContentTypeField
                             {
                                 Id = "Default",
                                 Type = "Image"
@@ -91,14 +102,14 @@ namespace Piranha.Tests.Repositories
             new PostType
             {
                 Id = "MyFourthType",
-                Regions = new List<RegionType>
+                Regions = new List<ContentTypeRegion>
                 {
-                    new RegionType
+                    new ContentTypeRegion
                     {
                         Id = "Body",
-                        Fields = new List<FieldType>
+                        Fields = new List<ContentTypeField>
                         {
-                            new FieldType
+                            new ContentTypeField
                             {
                                 Id = "Default",
                                 Type = "String"
@@ -110,14 +121,14 @@ namespace Piranha.Tests.Repositories
             new PostType
             {
                 Id = "MyFifthType",
-                Regions = new List<RegionType>
+                Regions = new List<ContentTypeRegion>
                 {
-                    new RegionType
+                    new ContentTypeRegion
                     {
                         Id = "Body",
-                        Fields = new List<FieldType>
+                        Fields = new List<ContentTypeField>
                         {
-                            new FieldType
+                            new ContentTypeField
                             {
                                 Id = "Default",
                                 Type = "Text"
@@ -156,7 +167,9 @@ namespace Piranha.Tests.Repositories
         {
             using (var api = CreateApi())
             {
-                Assert.Equal(this.GetType() == typeof(PostTypeTestsCached), ((Api)api).IsCached);
+                Assert.Equal(((Api)api).IsCached,
+                    this.GetType() == typeof(PostTypeTestsMemoryCache) ||
+                    this.GetType() == typeof(PostTypeTestsDistributedCache));
             }
         }
 

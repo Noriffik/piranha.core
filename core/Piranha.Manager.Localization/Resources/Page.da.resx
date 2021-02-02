@@ -36,11 +36,29 @@
   <data name="If the page should be hidden in the sitemap" xml:space="preserve">
     <value>Markér for at skjule siden i menuer</value>
   </data>
+  <data name="If the page should be indexed by search engines." xml:space="preserve">
+    <value>Markér for at lade søgemaskiner indeksere siden.</value>
+  </data>
+  <data name="If links from this page should be indexed." xml:space="preserve">
+    <value>Markér for at indeksere links på denne side.</value>
+  </data>
+  <data name="Meta title" xml:space="preserve">
+    <value>Metatitel</value>
+  </data>
   <data name="Meta keywords" xml:space="preserve">
     <value>Meta søgeord</value>
   </data>
   <data name="Meta description" xml:space="preserve">
     <value>Meta beskrivelse</value>
+  </data>
+  <data name="Og title" xml:space="preserve">
+    <value>OG titel</value>
+  </data>
+  <data name="Og image" xml:space="preserve">
+    <value>OG billede</value>
+  </data>
+  <data name="Og description" xml:space="preserve">
+    <value>OG beskrivelse</value>
   </data>
   <data name="Navigation title" xml:space="preserve">
     <value>Navigationstitel</value>

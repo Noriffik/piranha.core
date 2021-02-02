@@ -143,12 +143,16 @@ namespace Piranha.Manager.Services
         {
             var page = await _api.Pages.CreateAsync<DynamicPage>(typeId);
 
-            page.Id = Guid.NewGuid();
-            page.SiteId = siteId;
-            page.SortOrder = (await _api.Sites.GetSitemapAsync(page.SiteId)).Count;
-
             if (page != null)
             {
+                page.Id = Guid.NewGuid();
+                page.SiteId = siteId;
+                page.SortOrder = (await _api.Sites.GetSitemapAsync(page.SiteId)).Count;
+
+                // Perform manager init
+                await _factory.InitDynamicManagerAsync(page,
+                    App.PageTypes.GetById(page.TypeId));
+
                 return Transform(page, false);
             }
             return null;
@@ -169,7 +173,11 @@ namespace Piranha.Manager.Services
 
                 if (page != null)
                 {
-                    return Transform(page, false);
+                    // Perform manager init
+                    await _factory.InitDynamicManagerAsync(page,
+                        App.PageTypes.GetById(page.TypeId));
+
+                   return Transform(page, false);
                 }
             }
             return null;
@@ -190,6 +198,10 @@ namespace Piranha.Manager.Services
                     page.SiteId = relative.SiteId;
                     page.ParentId = after ? relative.ParentId : relative.Id;
                     page.SortOrder = after ? relative.SortOrder + 1 : 0;
+
+                    // Perform manager init
+                    await _factory.InitDynamicManagerAsync(page,
+                        App.PageTypes.GetById(page.TypeId));
 
                     return Transform(page, false);
                 }
@@ -234,6 +246,10 @@ namespace Piranha.Manager.Services
 
                 page = await _api.Pages.GetByIdAsync(id);
 
+                // Perform manager init
+                await _factory.InitDynamicManagerAsync(page,
+                    App.PageTypes.GetById(page.TypeId));
+
                 return Transform(page, false);
             }
             return null;
@@ -266,12 +282,19 @@ namespace Piranha.Manager.Services
                 page.Title = model.Title;
                 page.NavigationTitle = model.NavigationTitle;
                 page.Slug = model.Slug;
+                page.MetaTitle = model.MetaTitle;
                 page.MetaKeywords = model.MetaKeywords;
                 page.MetaDescription = model.MetaDescription;
+                page.MetaIndex = model.MetaIndex;
+                page.MetaFollow = model.MetaFollow;
+                page.MetaPriority = model.MetaPriority;
+                page.OgTitle = model.OgTitle;
+                page.OgDescription = model.OgDescription;
+                page.OgImage = model.OgImage;
                 page.PrimaryImage = model.PrimaryImage;
                 page.Excerpt = model.Excerpt;
                 page.IsHidden = model.IsHidden;
-                page.Published = !string.IsNullOrEmpty(model.Published) ? DateTime.Parse(model.Published) : (DateTime?)null;
+                page.Published = ParsePublishedDate(model); // !string.IsNullOrEmpty(model.Published) ? DateTime.Parse(model.Published) : (DateTime?)null;
                 page.RedirectUrl = model.RedirectUrl;
                 page.RedirectType = (RedirectType)Enum.Parse(typeof(RedirectType), model.RedirectType);
                 page.EnableComments = model.EnableComments;
@@ -488,6 +511,7 @@ namespace Piranha.Manager.Services
                 EditUrl = "manager/page/edit/",
                 IsExpanded = level < expandedLevels,
                 IsCopy = item.OriginalPageId.HasValue,
+                IsRestricted = item.Permissions.Count > 0,
                 Permalink = item.Permalink
             };
 
@@ -515,12 +539,20 @@ namespace Piranha.Manager.Services
                 Title = page.Title,
                 NavigationTitle = page.NavigationTitle,
                 Slug = page.Slug,
+                MetaTitle = page.MetaTitle,
                 MetaKeywords = page.MetaKeywords,
                 MetaDescription = page.MetaDescription,
+                MetaIndex = page.MetaIndex,
+                MetaFollow = page.MetaFollow,
+                MetaPriority = page.MetaPriority,
+                OgTitle = page.OgTitle,
+                OgDescription = page.OgDescription,
+                OgImage = page.OgImage,
                 PrimaryImage = page.PrimaryImage,
                 Excerpt = page.Excerpt,
                 IsHidden = page.IsHidden,
-                Published = page.Published.HasValue ? page.Published.Value.ToString("yyyy-MM-dd HH:mm") : null,
+                Published = page.Published.HasValue ? page.Published.Value.ToString("yyyy-MM-dd") : null,
+                PublishedTime = page.Published.HasValue ? page.Published.Value.ToString("HH:mm") : null,
                 RedirectUrl = page.RedirectUrl,
                 RedirectType = page.RedirectType.ToString(),
                 EnableComments = page.EnableComments,
@@ -593,7 +625,8 @@ namespace Piranha.Manager.Services
                                 Component = appFieldType.Component,
                                 Placeholder = fieldType.Placeholder,
                                 IsHalfWidth = fieldType.Options.HasFlag(FieldOption.HalfWidth),
-                                Description = fieldType.Description
+                                Description = fieldType.Description,
+                                Settings = fieldType.Settings
                             }
                         };
 
@@ -757,6 +790,21 @@ namespace Piranha.Manager.Services
                 });
             }
             return model;
+        }
+
+        private DateTime? ParsePublishedDate(PageEditModel model)
+        {
+            if (!string.IsNullOrEmpty(model.Published))
+            {
+                var str = model.Published;
+
+                if (!string.IsNullOrEmpty(model.PublishedTime))
+                {
+                    str += $" { model.PublishedTime }";
+                }
+                return DateTime.Parse(str);
+            }
+            return null;
         }
     }
 }

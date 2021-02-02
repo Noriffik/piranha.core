@@ -18,7 +18,6 @@ piranha.pagelist = new Vue({
     methods: {
         load: function () {
             var self = this;
-            console.log(piranha.baseUrl + "manager/api/page/list");
             piranha.permissions.load(function () {
                 fetch(piranha.baseUrl + "manager/api/page/list")
                 .then(function (response) { return response.json(); })
@@ -119,6 +118,32 @@ piranha.pagelist = new Vue({
                     self.addSiteTitle = e.title;
                 }
             });
+        },
+        collapse: function () {
+            for (var n = 0; n < this.sites.length; n++)
+            {
+                for (var i = 0; i < this.sites[n].pages.length; i++)
+                {
+                    this.changeVisibility(this.sites[n].pages[i], false);
+                }
+            }
+        },
+        expand: function () {
+            for (var n = 0; n < this.sites.length; n++)
+            {
+                for (var i = 0; i < this.sites[n].pages.length; i++)
+                {
+                    this.changeVisibility(this.sites[n].pages[i], true);
+                }
+            }
+        },
+        changeVisibility: function (page, expanded) {
+            page.isExpanded = expanded;
+
+            for (var n = 0; n < page.items.length; n++)
+            {
+                this.changeVisibility(page.items[n], expanded);
+            }
         }
     },
     created: function () {

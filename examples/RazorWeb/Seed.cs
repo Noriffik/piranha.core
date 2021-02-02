@@ -33,6 +33,15 @@ namespace RazorWeb
                     new { id = Guid.NewGuid(), filename = "drifter2.jpg" },
                 };
 
+                // Create secondary language
+                var lang2Id = Guid.NewGuid();
+                await api.Languages.SaveAsync(new Piranha.Models.Language
+                {
+                    Id = lang2Id,
+                    Title = "Swedish",
+                    Culture = "sv-SE"
+                });
+
                 // Get the default site id
                 var siteId = (await api.Sites.GetDefaultAsync()).Id;
                 var site2Id = Guid.NewGuid();
@@ -40,6 +49,7 @@ namespace RazorWeb
                 await api.Sites.SaveAsync(new Piranha.Models.Site
                 {
                     Id = site2Id,
+                    LanguageId = lang2Id,
                     Title = "Swedish",
                     Culture = "sv-SE"
                 });
@@ -49,7 +59,7 @@ namespace RazorWeb
                 {
                     using (var stream = File.OpenRead("seed/" + image.filename))
                     {
-                        await api.Media.SaveAsync(new Piranha.Models.StreamMediaContent()
+                        await api.Media.SaveAsync(new Piranha.Models.StreamMediaContent
                         {
                             Id = image.id,
                             Filename = image.filename,
@@ -57,6 +67,25 @@ namespace RazorWeb
                         });
                     }
                 }
+
+                var content = await Models.StandardProduct.CreateAsync(api).ConfigureAwait(false);
+                content.Title = "My content";
+                content.Category = "Uncategorized";
+                content.Tags.Add("Lorem");
+                content.Tags.Add("Ipsum");
+                content.AllFields.Date = DateTime.Now;
+                content.AllFields.Text = "Lorum ipsum";
+                await api.Content.SaveAsync(content);
+
+                content.Title = "Mitt innehåll";
+                content.AllFields.Text = "Svenskum dansum";
+                await api.Content.SaveAsync(content, lang2Id);
+
+                var loadedContent = await api.Content.GetByIdAsync<Models.StandardProduct>(content.Id);
+                var swedishContent = await api.Content.GetByIdAsync<Models.StandardProduct>(content.Id, lang2Id);
+                var infoContent = await api.Content.GetByIdAsync<Piranha.Models.ContentInfo>(content.Id, lang2Id);
+                var dynamicSwedish = await api.Content.GetByIdAsync(content.Id, lang2Id);
+                var allContent = await api.Content.GetAllAsync();
 
                 // Create the start page
                 var startpage = await Models.TeaserPage.CreateAsync(api).ConfigureAwait(false);
@@ -326,6 +355,20 @@ namespace RazorWeb
                 }
                 blogpost.Published = DateTime.Now.AddDays(7);
                 await api.Posts.SaveAsync(blogpost);
+
+                // Add a banner
+                var banner = await Models.ImageBanner.CreateAsync(api);
+                banner.Title = "Welcome to Piranha";
+                banner.Category = "Images";
+                banner.PrimaryImage = images[0].id;
+                banner.Excerpt = "This is a descriptive text";
+                await api.Content.SaveAsync(banner);
+
+                // Translate the banner to another language
+                banner.Title = "Välkommen till Piranha";
+                banner.Category = "Bilder";
+                banner.Excerpt = "Det här är en beskrivande text";
+                await api.Content.SaveAsync(banner, lang2Id);
             }
         }
     }

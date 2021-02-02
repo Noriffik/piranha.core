@@ -18,6 +18,10 @@ using X.Web.Sitemap;
 
 namespace Piranha.AspNetCore
 {
+    /// <summary>
+    /// Middleware used to ouput a xml sitemap based on
+    /// the content of the current site.
+    /// </summary>
     public class SitemapMiddleware : MiddlewareBase
     {
         private readonly PiranhaRouteConfig _config;
@@ -76,6 +80,9 @@ namespace Piranha.AspNetCore
 
                     foreach (var page in pages)
                     {
+                        if (!page.MetaIndex)
+                            continue;
+
                         var urls = await GetPageUrlsAsync(api, page, baseUrl).ConfigureAwait(false);
 
                         if (urls.Count > 0)
@@ -101,7 +108,7 @@ namespace Piranha.AspNetCore
                 {
                     ChangeFrequency = ChangeFrequency.Daily,
                     Location = baseUrl + item.Permalink,
-                    Priority = 0.5,
+                    Priority = item.MetaPriority,
                     TimeStamp = item.LastModified
                 });
 
@@ -109,13 +116,13 @@ namespace Piranha.AspNetCore
                 var posts = await api.Posts.GetAllAsync(item.Id);
                 foreach (var post in posts)
                 {
-                    if (post.Published.HasValue && post.Published.Value <= DateTime.Now)
+                    if (post.MetaIndex && post.Published.HasValue && post.Published.Value <= DateTime.Now)
                     {
                         urls.Add(new Url
                         {
                             ChangeFrequency = ChangeFrequency.Daily,
                             Location = baseUrl + post.Permalink,
-                            Priority = 0.5,
+                            Priority = post.MetaPriority,
                             TimeStamp = post.LastModified
                         });
                     }
@@ -123,7 +130,7 @@ namespace Piranha.AspNetCore
 
                 foreach (var child in item.Items)
                 {
-                    var childUrls = await GetPageUrlsAsync(api, child, baseUrl);
+                    var childUrls = await GetPageUrlsAsync(api, child, baseUrl).ConfigureAwait(false);
 
                     if (childUrls.Count > 0)
                     {

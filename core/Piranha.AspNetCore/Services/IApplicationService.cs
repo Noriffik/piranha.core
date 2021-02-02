@@ -11,10 +11,16 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Piranha.AspNetCore.Helpers;
 using Piranha.Models;
 
 namespace Piranha.AspNetCore.Services
 {
+    /// <summary>
+    /// The main application service. This service must be
+    /// registered as a scoped service as it contains information
+    /// about the current requst.
+    /// </summary>
     public interface IApplicationService
     {
         /// <summary>
@@ -33,14 +39,9 @@ namespace Piranha.AspNetCore.Services
         IMediaHelper Media { get; }
 
         /// <summary>
-        /// Gets/sets the currently requested URL.
+        /// Gets the request helper.
         /// </summary>
-        string Url { get; set; }
-
-        /// <summary>
-        /// Gets/sets the requested hostname
-        /// </summary>
-        string Hostname { get; set; }
+        IRequestHelper Request { get; }
 
         /// <summary>
         /// Gets/sets the id of the currently requested page.

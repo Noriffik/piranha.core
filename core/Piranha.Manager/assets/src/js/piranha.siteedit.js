@@ -8,13 +8,19 @@ piranha.siteedit = new Vue({
         loading: true,
         id: null,
         typeId: null,
+        languageId: null,
         title: null,
         internalId: null,
         culture: null,
         description: null,
+        logo: {
+            id: null,
+            media: null
+        },
         hostnames: null,
         isDefault: false,
         siteTypes: [],
+        languages: [],
         regions: [],
         isNew: false,
         isConfirm: false,
@@ -35,13 +41,16 @@ piranha.siteedit = new Vue({
                 .then(function (result) {
                     self.id = result.id;
                     self.typeId = result.typeId;
+                    self.languageId = result.languageId;
                     self.title = result.title;
                     self.internalId = result.internalId;
                     self.culture = result.culture;
                     self.description = result.description;
+                    self.logo = result.logo;
                     self.hostnames = result.hostnames;
                     self.isDefault = result.isDefault;
                     self.siteTypes = result.siteTypes;
+                    self.languages = result.languages;
                 })
                 .catch(function (error) { console.log("error:", error ); });
 
@@ -64,10 +73,12 @@ piranha.siteedit = new Vue({
             var model = {
                 id: this.id,
                 typeId: this.typeId,
+                languageId: this.languageId,
                 title: this.title,
                 internalId: this.internalId,
                 culture: this.culture,
                 description: this.description,
+                logo: this.logo,
                 hostnames: this.hostnames,
                 isDefault: this.isDefault
             };
@@ -160,6 +171,7 @@ piranha.siteedit = new Vue({
                     self.hostnames = result.hostnames;
                     self.isDefault = result.isDefault;
                     self.siteTypes = result.siteTypes;
+                    self.languages = result.languages;
 
                     self.isNew = true;
                     self.callback = cb;

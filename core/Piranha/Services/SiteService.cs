@@ -29,6 +29,7 @@ namespace Piranha.Services
 
         private readonly ISiteRepository _repo;
         private readonly IContentFactory _factory;
+        private readonly ILanguageService _langService;
         private readonly ICache _cache;
         private const string SITE_MAPPINGS = "Site_Mappings";
 
@@ -37,11 +38,13 @@ namespace Piranha.Services
         /// </summary>
         /// <param name="repo">The main repository</param>
         /// <param name="factory">The content factory</param>
+        /// <param name="langService">The language service</param>
         /// <param name="cache">The optional model cache</param>
-        public SiteService(ISiteRepository repo, IContentFactory factory, ICache cache = null)
+        public SiteService(ISiteRepository repo, IContentFactory factory, ILanguageService langService, ICache cache = null)
         {
             _repo = repo;
             _factory = factory;
+            _langService = langService;
 
             if ((int)App.CacheLevel > 0)
             {
@@ -53,9 +56,21 @@ namespace Piranha.Services
         /// Gets all available models.
         /// </summary>
         /// <returns>The available models</returns>
-        public Task<IEnumerable<Site>> GetAllAsync()
+        public async Task<IEnumerable<Site>> GetAllAsync()
         {
-            return _repo.GetAll();
+            var models = await _repo.GetAll();
+
+            if (models.Count() > 0)
+            {
+                foreach (var model in models)
+                {
+                    if (model.Logo != null && model.Logo.Id.HasValue)
+                    {
+                        await _factory.InitFieldAsync(model.Logo);
+                    }
+                }
+            }
+            return models;
         }
 
         /// <summary>
@@ -72,6 +87,11 @@ namespace Piranha.Services
                 model = await _repo.GetById(id).ConfigureAwait(false);
 
                 OnLoad(model);
+            }
+
+            if (model != null && model.Logo != null && model.Logo.Id.HasValue)
+            {
+                await _factory.InitFieldAsync(model.Logo);
             }
             return model;
         }
@@ -95,6 +115,11 @@ namespace Piranha.Services
                 model = await _repo.GetByInternalId(internalId).ConfigureAwait(false);
 
                 OnLoad(model);
+            }
+
+            if (model != null &&model.Logo != null && model.Logo.Id.HasValue)
+            {
+                await _factory.InitFieldAsync(model.Logo);
             }
             return model;
         }
@@ -165,6 +190,11 @@ namespace Piranha.Services
                 model = await _repo.GetDefault().ConfigureAwait(false);
 
                 OnLoad(model);
+            }
+
+            if (model != null && model.Logo != null && model.Logo.Id.HasValue)
+            {
+                await _factory.InitFieldAsync(model.Logo);
             }
             return model;
         }
@@ -239,6 +269,8 @@ namespace Piranha.Services
                 {
                     sitemap = await _repo.GetSitemap(id.Value, onlyPublished).ConfigureAwait(false);
 
+                    App.Hooks.OnLoad<Sitemap>(sitemap);
+
                     if (onlyPublished)
                     {
                         _cache?.Set($"Sitemap_{id}", sitemap);
@@ -262,6 +294,12 @@ namespace Piranha.Services
                 model.Id = Guid.NewGuid();
             }
 
+            // Ensure language id
+            if (model.LanguageId == Guid.Empty)
+            {
+                model.LanguageId = (await _langService.GetDefaultAsync()).Id;
+            }
+
             // Validate model
             var context = new ValidationContext(model);
             Validator.ValidateObject(model, context, true);
@@ -283,12 +321,15 @@ namespace Piranha.Services
             if (model.IsDefault)
             {
                 // Make sure no other site is default first
-                var def = await GetDefaultAsync().ConfigureAwait(false);
+                var def = await _repo.GetDefault().ConfigureAwait(false);
 
                 if (def != null && def.Id != model.Id)
                 {
                     def.IsDefault = false;
                     await _repo.Save(def).ConfigureAwait(false);
+
+                    // Remove the old default site from cache
+                    RemoveFromCache(def);
                 }
             }
             else
@@ -376,6 +417,11 @@ namespace Piranha.Services
                     site.ContentLastModified = DateTime.Now;
                     await SaveAsync(site).ConfigureAwait(false);
                 }
+            }
+            var sitemap = _cache?.Get<Sitemap>($"Sitemap_{id}");
+            if (sitemap != null)
+            {
+                App.Hooks.OnBeforeDelete<Sitemap>(sitemap);
             }
             _cache?.Remove($"Sitemap_{id}");
         }

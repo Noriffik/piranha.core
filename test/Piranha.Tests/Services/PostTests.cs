@@ -10,8 +10,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Piranha.AttributeBuilder;
@@ -22,12 +25,21 @@ using Piranha.Models;
 namespace Piranha.Tests.Services
 {
     [Collection("Integration tests")]
-    public class PostTestsCached : PostTests
+    public class PostTestsMemoryCache : PostTests
     {
         public override async Task InitializeAsync()
         {
-            _cache = new Cache.SimpleCache();
+            _cache = new Cache.MemoryCache((IMemoryCache)_services.GetService(typeof(IMemoryCache)));
+            await base.InitializeAsync();
+        }
+    }
 
+    [Collection("Integration tests")]
+    public class PostTestsDistributedCache : PostTests
+    {
+        public override async Task InitializeAsync()
+        {
+            _cache = new Cache.DistributedCache((IDistributedCache)_services.GetService(typeof(IDistributedCache)));
             await base.InitializeAsync();
         }
     }
@@ -99,7 +111,7 @@ namespace Piranha.Tests.Services
 
         public override async Task InitializeAsync()
         {
-            _services = new ServiceCollection()
+            _services = CreateServiceCollection()
                 .AddSingleton<IMyService, MyService>()
                 .BuildServiceProvider();
 
@@ -109,15 +121,13 @@ namespace Piranha.Tests.Services
 
                 Piranha.App.Fields.Register<MyFourthField>();
 
-                var pageTypeBuilder = new PageTypeBuilder(api)
-                    .AddType(typeof(BlogPage));
-                pageTypeBuilder.Build();
-                var postTypeBuilder = new PostTypeBuilder(api)
+                new ContentTypeBuilder(api)
+                    .AddType(typeof(BlogPage))
                     .AddType(typeof(MissingPost))
                     .AddType(typeof(MyPost))
                     .AddType(typeof(MyCollectionPost))
-                    .AddType(typeof(MyDIPost));
-                postTypeBuilder.Build();
+                    .AddType(typeof(MyDIPost))
+                    .Build();
 
                 // Add site
                 var site = new Site
@@ -237,7 +247,9 @@ namespace Piranha.Tests.Services
         {
             using (var api = CreateApi())
             {
-                Assert.Equal(this.GetType() == typeof(PostTestsCached), ((Api)api).IsCached);
+                Assert.Equal(((Api)api).IsCached,
+                    this.GetType() == typeof(PostTestsMemoryCache) ||
+                    this.GetType() == typeof(PostTestsDistributedCache));
             }
         }
 
@@ -699,6 +711,23 @@ namespace Piranha.Tests.Services
 
                 Assert.NotNull(post);
                 Assert.Equal(4, post.Tags.Count);
+            }
+        }
+
+        [Fact]
+        public async Task AddDuplicateSlugShouldThrow()
+        {
+            using (var api = CreateApi())
+            {
+                var post = await MyPost.CreateAsync(api);
+                post.BlogId = BLOG_ID;
+                post.Title = "My first post";
+                post.Published = DateTime.Now;
+
+                await Assert.ThrowsAsync<ValidationException>(async () =>
+                {
+                    await api.Posts.SaveAsync(post);
+                });
             }
         }
 

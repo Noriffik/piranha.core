@@ -29,11 +29,11 @@
                         <a v-on:click.prevent="removeItem(item)" href="#" class="danger"><i class="fas fa-trash"></i></a>
                     </span>
                 </div>
-                <div :id="'body' + item.uid" :class="{ 'collapse' : !model.meta.expanded}" :data-parent="'#' + model.meta.uid">
+                <div :id="'body' + item.uid" :class="{ 'collapse' : !model.meta.expanded }" :data-parent="'#' + model.meta.uid">
                     <div class="card-body">
                         <div class="row">
                             <div class="form-group" :class="{ 'col-sm-6': field.meta.isHalfWidth, 'col-sm-12': !field.meta.isHalfWidth }" v-bind:key="field.meta.uid" v-for="field in item.fields">
-                                <label>{{ field.meta.name }}</label>
+                                <label v-if="item.fields.length > 1 || field.meta.id !== 'Default'">{{ field.meta.name }}</label>
                                 <div v-if="field.meta.description != null" v-html="field.meta.description" class="field-description small text-muted"></div>
                                 <div class="field-body">
                                     <div :id="'tb-' + field.meta.uid" class="component-toolbar"></div>
@@ -58,6 +58,11 @@
 <script>
 export default {
     props: ["model", "content", "type"],
+    data: function () {
+        return {
+            itemAdded: false
+        };
+    },
     methods: {
         moveItem: function (from, to) {
             this.model.items.splice(to, 0, this.model.items.splice(from, 1)[0])
@@ -69,6 +74,7 @@ export default {
                 .then(function (response) { return response.json(); })
                 .then(function (result) {
                     self.model.items.push(result);
+                    self.itemAdded = true;
                 })
                 .catch(function (error) { console.log("error:", error );
             });
@@ -77,17 +83,23 @@ export default {
             this.model.items.splice(this.model.items.indexOf(item), 1);
         },
         updateTitle: function (e) {
-            for (var n = 0; n < this.model.items.length; n++) {
-                if (this.model.items[n].uid === e.uid) {
-                    this.model.items[n].title = e.title;
-                    break;
+            var self = this;
+            if (self.model.meta.isCollection) {
+                for (var n = 0; n < self.model.items.length; n++) {
+                    var item = self.model.items[n];
+                    for (var m = 0; m < item.fields.length; m++) {
+                        var field = item.fields[m];
+                        if (field.meta.uid === e.uid) {
+                            self.model.items[n].title = e.title;
+                            break;
+                        }
+                    }
                 }
             }
         },
     },
     mounted: function () {
-        if (this.model.meta.isCollection)
-        {
+        if (this.model.meta.isCollection) {
             var self = this;
 
             sortable("#" + this.model.meta.uid, {
@@ -96,6 +108,17 @@ export default {
             })[0].addEventListener("sortupdate", function (e) {
                 self.moveItem(e.detail.origin.index, e.detail.destination.index);
             });
+        }
+    },
+    updated: function () {
+        if (this.model.meta.isCollection && this.itemAdded) {
+            sortable("#" + this.model.meta.uid, "disable");
+            sortable("#" + this.model.meta.uid, "enable");
+
+            if (!this.model.meta.expanded) {
+                $("#" + this.model.meta.uid + " .card:last-child .card-header > a").click();
+            }
+            this.itemAdded = false;
         }
     }
 }

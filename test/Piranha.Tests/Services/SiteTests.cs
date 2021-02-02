@@ -12,6 +12,8 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Distributed;
 using Xunit;
 using Piranha.AttributeBuilder;
 using Piranha.Extend;
@@ -21,12 +23,21 @@ using Piranha.Models;
 namespace Piranha.Tests.Services
 {
     [Collection("Integration tests")]
-    public class SiteTestsCached : SiteTests
+    public class SiteTestsMemoryCache : SiteTests
     {
         public override async Task InitializeAsync()
         {
-            _cache = new Cache.SimpleCache();
+            _cache = new Cache.MemoryCache((IMemoryCache)_services.GetService(typeof(IMemoryCache)));
+            await base.InitializeAsync();
+        }
+    }
 
+    [Collection("Integration tests")]
+    public class SiteTestsDistributedCache : SiteTests
+    {
+        public override async Task InitializeAsync()
+        {
+            _cache = new Cache.DistributedCache((IDistributedCache)_services.GetService(typeof(IDistributedCache)));
             await base.InitializeAsync();
         }
     }
@@ -66,13 +77,10 @@ namespace Piranha.Tests.Services
             {
                 Piranha.App.Init(api);
 
-                var builder = new PageTypeBuilder(api)
-                    .AddType(typeof(MyPage));
-                builder.Build();
-
-                var siteBuilder = new SiteTypeBuilder(api)
-                    .AddType(typeof(MySiteContent));
-                siteBuilder.Build();
+                new ContentTypeBuilder(api)
+                    .AddType(typeof(MyPage))
+                    .AddType(typeof(MySiteContent))
+                    .Build();
 
                 await api.Sites.SaveAsync(new Site
                 {
@@ -188,7 +196,9 @@ namespace Piranha.Tests.Services
         public void IsCached()
         {
             using (var api = CreateApi()) {
-                Assert.Equal(this.GetType() == typeof(SiteTestsCached), ((Api)api).IsCached);
+                Assert.Equal(((Api)api).IsCached,
+                    this.GetType() == typeof(SiteTestsMemoryCache) ||
+                    this.GetType() == typeof(SiteTestsDistributedCache));
             }
         }
 

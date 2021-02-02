@@ -18,7 +18,7 @@ namespace Piranha.Models
     /// Base class for templated content types.
     /// </summary>
     [Serializable]
-    public abstract class ContentTypeBase
+    public abstract class ContentTypeBase : ITypeModel
     {
         /// <summary>
         /// Gets/sets the unique id.
@@ -41,7 +41,7 @@ namespace Piranha.Models
         /// <summary>
         /// Gets/sets the available regions.
         /// </summary>
-        public IList<RegionType> Regions { get; set; } = new List<RegionType>();
+        public IList<ContentTypeRegion> Regions { get; set; } = new List<ContentTypeRegion>();
 
         /// <summary>
         /// Gets/sets the optional routes.

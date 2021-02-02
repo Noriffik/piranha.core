@@ -11,8 +11,18 @@ piranha.postedit = new Vue({
         typeId: null,
         title: null,
         slug: null,
+        metaTitle: null,
         metaKeywords: null,
         metaDescription: null,
+        metaIndex: null,
+        metaFollow: null,
+        metaPriority: null,
+        ogTitle: null,
+        ogDescription: null,
+        ogImage: {
+            id: null,
+            media: null
+        },
         excerpt: null,
         published: null,
         redirectUrl: null,
@@ -70,6 +80,17 @@ piranha.postedit = new Vue({
         },
         isExcerptEmpty: function () {
             return piranha.utils.isEmptyText(this.excerpt);
+        },
+        metaPriorityDescription: function() {
+            var description = piranha.resources.texts.important;
+            if (this.metaPriority <= 0.3)
+                description = piranha.resources.texts.low;
+            else if (this.metaPriority <= 0.6)
+                description =  piranha.resources.texts.medium;
+            else if (this.metaPriority <= 0.9)
+                description =  piranha.resources.texts.high;
+
+            return description += " (" + this.metaPriority + ")";
         }
     },
     mounted() {
@@ -85,8 +106,15 @@ piranha.postedit = new Vue({
             this.typeId = model.typeId;
             this.title = model.title;
             this.slug = model.slug;
+            this.metaTitle = model.metaTitle;
             this.metaKeywords = model.metaKeywords;
             this.metaDescription = model.metaDescription;
+            this.metaIndex = model.metaIndex;
+            this.metaFollow = model.metaFollow;
+            this.metaPriority = model.metaPriority;
+            this.ogTitle = model.ogTitle;
+            this.ogDescription = model.ogDescription;
+            this.ogImage = model.ogImage;
             this.excerpt = model.excerpt;
             this.published = model.published;
             this.redirectUrl = model.redirectUrl;
@@ -189,8 +217,17 @@ piranha.postedit = new Vue({
                 },
                 title: self.title,
                 slug: self.slug,
+                metaTitle: self.metaTitle,
                 metaKeywords: self.metaKeywords,
                 metaDescription: self.metaDescription,
+                metaIndex: self.metaIndex,
+                metaFollow: self.metaFollow,
+                metaPriority: self.metaPriority,
+                ogTitle: self.ogTitle,
+                ogDescription: self.ogDescription,
+                ogImage: {
+                    id: self.ogImage.id
+                },
                 excerpt: self.excerpt,
                 published: self.published,
                 redirectUrl: self.redirectUrl,
@@ -252,7 +289,7 @@ piranha.postedit = new Vue({
                         });
                         $("#selectedTags").select2({
                             tags: true,
-                            selectOnClose: true,
+                            selectOnClose: false,
                             placeholder: piranha.resources.texts.addTags
                         });
                     });
@@ -353,7 +390,7 @@ piranha.postedit = new Vue({
             }
         },
         onExcerptBlur: function (e) {
-            this.excerpt = e.target.innerHTML;
+            this.excerpt = tinyMCE.activeEditor.getContent();
         }
     },
     created: function () {
@@ -380,7 +417,7 @@ piranha.postedit = new Vue({
             });
             $("#selectedTags").select2({
                 tags: true,
-                selectOnClose: true,
+                selectOnClose: false,
                 placeholder: piranha.resources.texts.addTags
             });
             $("#selectedTags").on("change", function() {

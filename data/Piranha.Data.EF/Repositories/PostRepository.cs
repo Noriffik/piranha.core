@@ -458,7 +458,6 @@ namespace Piranha.Repositories
         {
             var model = await _db.Posts
                 .Include(p => p.Blocks).ThenInclude(b => b.Block).ThenInclude(b => b.Fields)
-                .Include(p => p.Fields)
                 .FirstOrDefaultAsync(p => p.Id == id)
                 .ConfigureAwait(false);
 
@@ -475,9 +474,6 @@ namespace Piranha.Repositories
 
                 _db.Posts.Remove(model);
 
-                //
-                // TODO
-                //
                 // If this is a published post, update last modified for the
                 // blog page for caching purposes.
                 if (model.Published.HasValue)
@@ -705,11 +701,15 @@ namespace Piranha.Repositories
                     postQuery = postQuery.AsNoTracking();
                 }
 
+                // FirstOrDefaultAsync(p => p.Id ...
+                postQuery = postQuery.OrderBy(p => p.Id);
+
                 var post = await postQuery
                     .Include(p => p.Permissions)
                     .Include(p => p.Blocks).ThenInclude(b => b.Block).ThenInclude(b => b.Fields)
                     .Include(p => p.Fields)
                     .Include(p => p.Tags).ThenInclude(t => t.Tag)
+                    .AsSplitQuery()
                     .FirstOrDefaultAsync(p => p.Id == model.Id)
                     .ConfigureAwait(false);
 
@@ -1047,7 +1047,10 @@ namespace Piranha.Repositories
                     .Include(p => p.Blocks).ThenInclude(b => b.Block).ThenInclude(b => b.Fields)
                     .Include(p => p.Fields);
             }
-            return query;
+
+            query = query.OrderBy(p => p.Created);
+
+            return query.AsSplitQuery();
         }
 
         /// <summary>
@@ -1067,7 +1070,7 @@ namespace Piranha.Repositories
             model.EnableComments = post.EnableComments;
             if (model.EnableComments)
             {
-                model.CommentCount = await _db.PostComments.CountAsync(c => c.PostId == model.Id).ConfigureAwait(false);
+                model.CommentCount = await _db.PostComments.CountAsync(c => c.PostId == model.Id && c.IsApproved).ConfigureAwait(false);
             }
             model.CloseCommentsAfterDays = post.CloseCommentsAfterDays;
 

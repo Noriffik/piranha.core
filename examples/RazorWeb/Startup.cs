@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using Piranha;
 using Piranha.Data.EF.SQLite;
 using Piranha.AspNetCore.Identity.SQLite;
@@ -28,9 +27,6 @@ namespace RazorWeb
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            //
-            // Simplified setup with dependencies
-            //
             services.AddPiranha(options =>
             {
                 options.AddRazorRuntimeCompilation = true;
@@ -40,21 +36,16 @@ namespace RazorWeb
                 options.UseManager();
                 options.UseTinyMCE();
                 options.UseMemoryCache();
-                options.UseApi(config =>
-                {
-                    config.AllowAnonymousAccess = true;
-                });
 
                 options.UseEF<SQLiteDb>(db =>
                     db.UseSqlite("Filename=./piranha.razorweb.db"));
                 options.UseIdentityWithSeed<IdentitySQLiteDb>(db =>
                     db.UseSqlite("Filename=./piranha.razorweb.db"));
-            });
 
-            services.AddSwaggerGen(options =>
-            {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "PiranhaCMS API", Version = "v1" });
-                options.CustomSchemaIds(x => x.FullName);
+                options.UseSecurity(o =>
+                {
+                    o.UsePermission("Subscriber");
+                });
             });
         }
 
@@ -64,20 +55,18 @@ namespace RazorWeb
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-
-                // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-                // specifying the Swagger JSON endpoint.
-                app.UseSwaggerUI(options =>
-                {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "PiranhaCMS API V1");
-                });
             }
 
             App.Init(api);
 
             // Configure cache level
             App.CacheLevel = Piranha.Cache.CacheLevel.Full;
+
+            // Register custom components
+            App.Blocks.Register<RazorWeb.Models.Blocks.MyGenericBlock>();
+            App.Blocks.Register<RazorWeb.Models.Blocks.RawHtmlBlock>();
+            App.Modules.Manager().Scripts.Add("~/assets/custom-blocks.js");
+            App.Modules.Manager().Styles.Add("~/assets/custom-blocks.css");
 
             // Build content types
             new ContentTypeBuilder(api)
@@ -97,10 +86,8 @@ namespace RazorWeb
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
              */
 
-            //
-            // Simplified setup with dependencies
-            //
-            app.UsePiranha(options => {
+            app.UsePiranha(options =>
+            {
                 options.UseManager();
                 options.UseTinyMCE();
                 options.UseIdentity();

@@ -396,7 +396,7 @@ namespace Piranha.Services
             {
                 var blog = await _pageService.GetByIdAsync<PageInfo>(draft.BlogId).ConfigureAwait(false);
 
-                await OnLoadAsync(draft, blog, true);
+                await OnLoadAsync(draft, blog, true).ConfigureAwait(false);
             }
             return draft;
         }
@@ -621,6 +621,12 @@ namespace Piranha.Services
                     model.Created = DateTime.Now;
                 }
 
+                // Ensure content id
+                if (model.ContentId == Guid.Empty)
+                {
+                    model.ContentId = postId;
+                }
+
                 // Validate model
                 var context = new ValidationContext(model);
                 Validator.ValidateObject(model, context, true);
@@ -697,6 +703,13 @@ namespace Piranha.Services
                 throw new ValidationException("The generated slug is empty as the title only contains special characters, please specify a slug to save the post.");
             }
 
+            // Ensure that the slug is unique
+            var duplicate = await GetBySlugAsync(model.BlogId, model.Slug);
+            if (duplicate != null && duplicate.Id != model.Id)
+            {
+                throw new ValidationException("The specified slug already exists, please create a unique slug");
+            }
+
             // Ensure category
             if (model.Category == null || (string.IsNullOrWhiteSpace(model.Category.Title) && string.IsNullOrWhiteSpace(model.Category.Slug)))
             {
@@ -742,7 +755,7 @@ namespace Piranha.Services
             App.Hooks.OnAfterSave<PostBase>(model);
 
             // Update search document
-            if (_search != null)
+            if (!isDraft && _search != null)
             {
                 await _search.SavePostAsync(model);
             }
@@ -813,7 +826,7 @@ namespace Piranha.Services
         /// <param name="id">The unique id</param>
         public async Task DeleteCommentAsync(Guid id)
         {
-            var model = await GetCommentByIdAsync(id);
+            var model = await GetCommentByIdAsync(id).ConfigureAwait(false);
 
             if (model != null)
             {
@@ -946,13 +959,18 @@ namespace Piranha.Services
 
                 if (model.PrimaryImage.Id.HasValue)
                 {
-                    model.PrimaryImage.Media = await _mediaService.GetByIdAsync(model.PrimaryImage.Id.Value).ConfigureAwait(false);
+                    await _factory.InitFieldAsync(model.PrimaryImage).ConfigureAwait(false);
+                }
 
-                    // Clear id if the image has been deleted
-                    if (model.PrimaryImage.Media == null)
-                    {
-                        model.PrimaryImage.Id = null;
-                    }
+                // Initialize og image
+                if (model.OgImage == null)
+                {
+                    model.OgImage = new Extend.Fields.ImageField();
+                }
+
+                if (model.OgImage.Id.HasValue)
+                {
+                    await _factory.InitFieldAsync(model.OgImage).ConfigureAwait(false);
                 }
 
                 App.Hooks.OnLoad(model);

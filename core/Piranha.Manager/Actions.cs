@@ -62,6 +62,33 @@ namespace Piranha.Manager
             };
 
             /// <summary>
+            /// Gets the available actions for the content list view.
+            /// </summary>
+            public ActionList<ToolbarAction> ContentList { get; private set; } = new ActionList<ToolbarAction>();
+
+            /// <summary>
+            /// Gets the available actions for the content edit view.
+            /// </summary>
+            public ActionList<ToolbarAction> ContentEdit { get; private set; } = new ActionList<ToolbarAction>
+            {
+                new ToolbarAction
+                {
+                    InternalId = "Languages",
+                    ActionView = "Partial/Actions/_ContentLangPicker"
+                },
+                new ToolbarAction
+                {
+                    InternalId = "Save",
+                    ActionView = "Partial/Actions/_ContentSave"
+                },
+                new ToolbarAction
+                {
+                    InternalId = "Delete",
+                    ActionView = "Partial/Actions/_ContentDelete"
+                }
+            };
+
+            /// <summary>
             /// Gets the available actions for media list view.
             /// </summary>
             public ActionList<ToolbarAction> MediaList { get; private set; } = new ActionList<ToolbarAction>();
@@ -104,6 +131,16 @@ namespace Piranha.Manager
             /// </summary>
             public ActionList<ToolbarAction> PageList { get; private set; } = new ActionList<ToolbarAction>
             {
+                new ToolbarAction
+                {
+                    InternalId = "Expand",
+                    ActionView = "Partial/Actions/_PageListExpand"
+                },
+                new ToolbarAction
+                {
+                    InternalId = "Collapse",
+                    ActionView = "Partial/Actions/_PageListCollapse"
+                },
                 new ToolbarAction
                 {
                     InternalId = "AddSite",
